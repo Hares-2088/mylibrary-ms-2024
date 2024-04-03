@@ -1,0 +1,11 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+
+title System Context Diagram for Library System
+
+Person(member, "Member", "member of the library")
+System(myLibrary, " Library System", "Manages members and reservations")
+
+Rel(member, myLibrary, "View available books","Uses")
+'SHOW_LEGEND()
+@enduml

@@ -1,0 +1,151 @@
+@startuml
+!define ENTITY(entityName) class entityName << Entity >>
+!define AGGREGATE(aggregateName) class aggregateName << Aggregate >>
+!define AGGREGATE_ROOT(aggregateRootName) class aggregateRootName << Aggregate Root >>
+!define AGGREGATE_ROOT_ENTITY(aggregateRootEntityName) class aggregateRootEntityName << Aggregate Root >> << Entity >>
+!define VALUE_OBJECT(valueObjectName) class valueObjectName << Value Object >>
+!pragma useVerticalIf on
+hide circle
+
+package "Library Management System" as LibrarySystem {
+
+    package "Catalog Sub-Domain" <<Rectangle>>  #3399ff{
+        ENTITY(Book) #lightblue {
+            bookId: Long
+            title: String
+            genre: String
+            description: String
+            publicationYear: Date
+            availableCopies: Integer
+        }
+
+        ENTITY(Author) #lightblue {
+            authorId: Long
+            firstName: String
+            lastName: String
+            biography: String
+        }
+
+        VALUE_OBJECT(Nationality) #Bisque{
+            city: String
+            province: String
+            country: String
+        }
+
+
+        VALUE_OBJECT(BookIdentifier) #Bisque {
+            isbn: String
+        }
+
+        VALUE_OBJECT(AuthorIdentifier) #Bisque {
+            authorId: UUID
+        }
+
+
+
+
+        Book "1"--> "1" AuthorIdentifier
+        Author o-"1" Nationality
+        Book --> BookIdentifier
+        Author --> AuthorIdentifier
+        Author "1"--- "0..*" BookIdentifier
+    }
+
+    package "Membership Sub-Domain" <<Rectangle>> #FFCDD2 {
+        ENTITY(Member) #lightblue {
+            memberId: Long
+            firstName: String
+            LastName: String
+            email: String
+        }
+
+        VALUE_OBJECT(MemberIdentifier) #Bisque{
+            memberId: UUID
+        }
+
+        VALUE_OBJECT(MembershipType) #Bisque{
+            benefits: String
+            type: String
+        }
+
+        VALUE_OBJECT(Address) #Bisque{
+                street: String
+                city: String
+                province: String
+                country: String
+        }
+
+        Member --> MemberIdentifier
+        Member o-- "1..*" Address
+        Member o-- "1" MembershipType
+
+    }
+
+    package "Loan Sub-Domain" <<Rectangle>> #DFBDF4{
+        AGGREGATE_ROOT_ENTITY(Loan) #lightblue {
+            loanId: Long
+            returned: Boolean
+        }
+
+        VALUE_OBJECT(LoanIdentifier) #Bisque {
+            loanId: UUID
+        }
+        VALUE_OBJECT(LoanPeriod) #Bisque {
+            loanDate: Date
+            dueDate: Date
+        }
+
+        note right of Loan #lightblue
+            Constraint: The member has to have a reservation for the book
+        end note
+
+        Loan "1" o-- "1" LoanPeriod
+        Loan --> LoanIdentifier
+'        Loan --> BookIdentifier
+'        Loan --> MemberIdentifier
+    }
+    package "Late Fees Sub-Domain" <<Rectangle>> #Yellow{
+
+        ENTITY(LateFee) #lightblue {
+            lateFeeId: Long
+            amount: Double
+            dueDate: Date
+            paid: Boolean
+        }
+        VALUE_OBJECT(LateFeeIdentifier) #Bisque {
+            loanDate: Date
+            dueDate: Date
+        }
+'        LateFee --> BookIdentifier
+'        LateFee --> MemberIdentifier
+        LateFee --> LateFeeIdentifier
+    }
+
+    package "Reservation Sub-Domain" <<Rectangle>> #FFA07A{
+        AGGREGATE_ROOT_ENTITY(Reservation) #lightblue {
+            reservationId: Long
+            reservationDate: Date
+            fulfilled: Boolean
+        }
+
+        VALUE_OBJECT(ReservationIdentifier) #Bisque {
+            reservationId: UUID
+        }
+
+        note right of Reservation #lightblue
+            Constraint: Number of copies available has to be higher than 0
+        end note
+
+        Reservation --> ReservationIdentifier
+'        Reservation --> MemberIdentifier
+    }
+
+'    Member "1" --> "0..*" ReservationIdentifier
+'    Loan --> LateFeeIdentifier
+'    Member "1" --> "0..*" BookIdentifier
+'    Reservation --> BookIdentifier
+
+}
+
+
+@enduml
