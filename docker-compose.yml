@@ -32,6 +32,20 @@ services:
       mysql2:
         condition: service_healthy
 
+  loans-service:
+    build: loans-service
+    hostname: loans-service
+    container_name: loans-service
+    ports:
+      - "8084:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mongodb
+      - members-service
+      - books-service
+      - reservations-service
+
   mysql1:
     image: mysql:5.7
     ports:
@@ -134,3 +148,28 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=admin
     depends_on:
       - postgres1
+
+  mongodb:
+    image: mongo
+    container_name: mongo_db
+    hostname: mongo_db
+    volumes:
+      - mongo:/data
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pwd
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    hostname: mongo_express
+    restart: always
+    ports:
+      - 8085:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo_db
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=user
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pwd
+
+volumes:
+  mongo: {}

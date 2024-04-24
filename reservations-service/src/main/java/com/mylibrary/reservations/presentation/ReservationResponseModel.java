@@ -1,24 +1,21 @@
 package com.mylibrary.reservations.presentation;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ReservationResponseModel{
 
     private String reservationId;
 
-//    private BookResponseModel book;
-//
-//    private MemberResponseModel member;
+    private String bookId;
 
-    private Date reservationDate;
+    private LocalDate reservationDate;
 }

@@ -6,7 +6,7 @@ import org.mapstruct.AfterMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,9 +24,8 @@ class ReservationRepositoryIntegrationTest {
     @Test
     public void whenReservationExists_ReturnReservationByReservationId() {
 
-        Date date = new Date(2005, 5, 5);
         //arrange
-        Reservation reservation = new Reservation(new ReservationIdentifier(), date);
+        Reservation reservation = new Reservation(LocalDate.now());
         reservationRepository.save(reservation);
 
         //act
@@ -35,5 +34,14 @@ class ReservationRepositoryIntegrationTest {
         //assert
         assertNotNull(savedReservation);
         assertEquals(reservation.getReservationIdentifier(), savedReservation.getReservationIdentifier());
+    }
+
+    @Test
+    public void whenReservationDoesNotExist_ReturnNull() {
+        //act
+        Reservation savedReservation = reservationRepository.findByReservationIdentifier_ReservationId("1234");
+
+        //assert
+        assertNull(savedReservation);
     }
 }

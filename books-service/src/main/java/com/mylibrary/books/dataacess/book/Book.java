@@ -35,8 +35,9 @@ public class Book {
 
     private Integer availableCopies;
 
-    public Book(String title, Date publicationYear, String genre, String description, Integer availableCopies) {
+    public Book(String title, AuthorIdentifier authorIdentifier, Date publicationYear, String genre, String description, Integer availableCopies) {
         this.bookIdentifier = new BookIdentifier();
+        this.authorIdentifier = authorIdentifier;
         this.title = title;
         this.publicationYear = publicationYear;
         this.genre = genre;

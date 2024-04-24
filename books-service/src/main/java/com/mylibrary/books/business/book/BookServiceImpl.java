@@ -61,8 +61,8 @@ public class BookServiceImpl implements BookService {
             throw new NotFoundException("Unknown authorId: " + bookRequestModel.getAuthorId());
         }
 
-        //Check if the year of publication is in the future
-        if (bookRequestModel.getPublicationYear().after(new Date())){
+        // Check if the year of publication is in the future and throw an exception if it is
+        if (bookRequestModel.getPublicationYear().after(new Date())) {
             throw new InvalidPublicationYear("Year of publication cannot be in the future");
         }
 
@@ -84,6 +84,11 @@ public class BookServiceImpl implements BookService {
 
         if (foundBook == null) {
             throw new NotFoundException("Unknown bookId: " + bookId);
+        }
+
+        // Check if the year of publication is in the future and throw an exception if it is
+        if (bookRequestModel.getPublicationYear().after(new Date())) {
+            throw new InvalidPublicationYear("Year of publication cannot be in the future");
         }
 
         Book book = bookRequestMapper.requestModelToEntity(bookRequestModel, author.getAuthorIdentifier()  ,foundBook.getBookIdentifier());

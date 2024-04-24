@@ -21,12 +21,12 @@ public class BookController {
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<BookResponseModel>> getBooks(){
-        return ResponseEntity.status(HttpStatus.FOUND).body(bookService.getBooks());
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.getBooks());
     }
 
     @GetMapping(value = "/{bookId}", produces = "application/json")
     public ResponseEntity<BookResponseModel> getBook(@PathVariable String bookId){
-        return ResponseEntity.status(HttpStatus.FOUND).body(bookService.getBook(bookId));
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.getBook(bookId));
     }
 
     @PostMapping(produces = "application/json", consumes = "application/json")

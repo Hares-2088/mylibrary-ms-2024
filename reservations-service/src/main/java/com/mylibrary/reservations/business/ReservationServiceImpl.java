@@ -13,6 +13,7 @@ import com.mylibrary.reservations.utils.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -105,7 +106,7 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationResponseModel createReservation(ReservationRequestModel reservationRequestModel) {
 
         //check if the date is in the future using the invalid date exception
-        if (reservationRequestModel.getReservationDate().before(new Date())) {
+        if (reservationRequestModel.getReservationDate().isBefore(LocalDate.now())){
             throw new InvalidDateException("This date is in the past: " + reservationRequestModel.getReservationDate());
         }
 
@@ -127,6 +128,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         Reservation reservation = reservationRequestMapper.requestModelToEntity(reservationRequestModel, new ReservationIdentifier());
 
+
         return reservationResponseMapper.entityToResponseModel(reservationRepository.save(reservation));
     }
 
@@ -135,6 +137,11 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationId(reservationId);
         if (reservation == null) {
             throw new NotFoundException("Unknown reservationId: " + reservationId);
+        }
+
+        //check if the date is in the future using the invalid date exception
+        if (reservationRequestModel.getReservationDate().isBefore(LocalDate.now())){
+            throw new InvalidDateException("This date is in the past: " + reservationRequestModel.getReservationDate());
         }
 
         // Update the book available copies

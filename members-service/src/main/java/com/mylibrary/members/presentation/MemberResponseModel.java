@@ -11,6 +11,8 @@ public class MemberResponseModel {
 
     private String memberId;
 
+    private String reservationId;
+
     private String firstName;
 
     private String lastName;

@@ -21,6 +21,8 @@ public class Member {
     @Embedded
     private MemberIdentifier memberIdentifier;
 
+    private String reservationId;
+
     private String firstName;
 
     private String lastName;

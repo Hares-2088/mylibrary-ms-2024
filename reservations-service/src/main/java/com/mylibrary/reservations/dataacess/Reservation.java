@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -22,10 +23,14 @@ public class Reservation {
     @Embedded
     private ReservationIdentifier reservationIdentifier;
 
-    private Date reservationDate;
+    private String memberId;
 
-    public Reservation(ReservationIdentifier reservationIdentifier, Date reservationDate) {
-        this.reservationIdentifier = reservationIdentifier;
+    private String bookId;
+
+    private LocalDate reservationDate;
+
+    public Reservation(LocalDate reservationDate) {
+        this.reservationIdentifier = new ReservationIdentifier();
         this.reservationDate = reservationDate;
     }
 }
