@@ -4,19 +4,24 @@ package com.mylibrary.reservations.business;
 import com.mylibrary.reservations.dataacess.Reservation;
 import com.mylibrary.reservations.dataacess.ReservationIdentifier;
 import com.mylibrary.reservations.dataacess.ReservationRepository;
+import com.mylibrary.reservations.domainclientlayer.BookModel;
+import com.mylibrary.reservations.domainclientlayer.BookServiceClient;
+import com.mylibrary.reservations.domainclientlayer.MemberModel;
+import com.mylibrary.reservations.domainclientlayer.MemberServiceClient;
 import com.mylibrary.reservations.mapper.ReservationRequestMapper;
 import com.mylibrary.reservations.mapper.ReservationResponseMapper;
 import com.mylibrary.reservations.presentation.ReservationRequestModel;
 import com.mylibrary.reservations.presentation.ReservationResponseModel;
 import com.mylibrary.reservations.utils.exceptions.InvalidDateException;
+import com.mylibrary.reservations.utils.exceptions.NotEnoughCopiesException;
 import com.mylibrary.reservations.utils.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -24,20 +29,17 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationRequestMapper reservationRequestMapper;
     private final ReservationResponseMapper reservationResponseMapper;
-//    private final BookRepository bookRepository;
-//    private final BookResponseMapper bookResponseMapper;
-//    private final MemberRepository memberRepository;
-//    private final MemberResponseMapper memberResponseMapper;
+    private final BookServiceClient bookServiceClient;
+    private final MemberServiceClient memberServiceClient;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository, ReservationRequestMapper reservationRequestMapper, ReservationResponseMapper reservationResponseMapper) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, ReservationRequestMapper reservationRequestMapper, ReservationResponseMapper reservationResponseMapper, BookServiceClient bookServiceClient, MemberServiceClient memberServiceClient) {
         this.reservationRepository = reservationRepository;
         this.reservationRequestMapper = reservationRequestMapper;
         this.reservationResponseMapper = reservationResponseMapper;
-//        this.bookRepository = bookRepository;
-//        this.bookResponseMapper = bookResponseMapper;
-//        this.memberRepository = memberRepository;
-//        this.memberResponseMapper = memberResponseMapper;
+
+        this.bookServiceClient = bookServiceClient;
+        this.memberServiceClient = memberServiceClient;
     }
 
     @Override
@@ -47,94 +49,60 @@ public class ReservationServiceImpl implements ReservationService {
         List<ReservationResponseModel> reservationResponseModels = new ArrayList<>();
 
         for (Reservation reservation : reservations) {
-//            BookResponseModel bookResponseModel = bookResponseMapper.entityToResponseModel(bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId()));
-//            Book book = bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId());
-//
-//            MemberResponseModel memberResponseModel = memberResponseMapper.entityToResponseModel(memberRepository.findByMemberIdentifier_MemberId(reservation.getMemberIdentifier().getMemberId()));
-//            Member member = memberRepository.findByMemberIdentifier_MemberId(reservation.getMemberIdentifier().getMemberId());
-
-//            if (book != null && member != null) {
-//                reservationResponseModels.add(reservationResponseMapper.entityToResponseModel(reservation, bookResponseModel, memberResponseModel, bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId()), memberRepository.findByMemberIdentifier_MemberId(reservation.getMemberIdentifier().getMemberId())));
-//            }
               reservationResponseModels.add(reservationResponseMapper.entityToResponseModel(reservation));
-
         }
         return reservationResponseModels;
     }
 
     @Override
-    public ReservationResponseModel getReservationByReservationId(String reservationId) {
-        Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationId(reservationId);
+    public ReservationResponseModel getReservationByReservationId(String reservationId, String memberId) {
+        Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationIdAndMemberId(reservationId, memberId);
         if (reservation == null) {
             throw new NotFoundException("Unknown reservationId: " + reservationId);
         }
-
-//        BookResponseModel bookResponseModel = bookResponseMapper.entityToResponseModel(bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId()));
-//        MemberResponseModel memberResponseModel = memberResponseMapper.entityToResponseModel(memberRepository.findByMemberIdentifier_MemberId(reservation.getMemberIdentifier().getMemberId()));
-
         return reservationResponseMapper.entityToResponseModel(reservation);
     }
 
-//    @Override
-//    public List<ReservationResponseModel> getReservations(String memberId) {
-//        List<Reservation> reservations = reservationRepository.findAllByMemberIdentifier_MemberId(memberId);
-//
-//        List<ReservationResponseModel> reservationResponseModels = new ArrayList<>();
-//
-//        for (Reservation reservation : reservations) {
-////            BookResponseModel bookResponseModel = bookResponseMapper.entityToResponseModel(bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId()));
-////            MemberResponseModel memberResponseModel = memberResponseMapper.entityToResponseModel(memberRepository.findByMemberIdentifier_MemberId(memberId));
-//            reservationResponseModels.add(reservationResponseMapper.entityToResponseModel(reservation));
-//        }
-//        return reservationResponseModels;
-//    }
-//
-//    @Override
-//    public ReservationResponseModel getReservation(String reservationId) {
-//        Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationId(reservationId);
-//        if (reservation == null) {
-//            throw new NotFoundException("Unknown reservationId: " + reservationId);
-//        }
-//
-////        BookResponseModel bookResponseModel = bookResponseMapper.entityToResponseModel(bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId()));
-////        MemberResponseModel memberResponseModel = memberResponseMapper.entityToResponseModel(memberRepository.findByMemberIdentifier_MemberId(memberId));
-//
-//        return reservationResponseMapper.entityToResponseModel(reservation);
-//    }
 
     @Override
-    public ReservationResponseModel createReservation(ReservationRequestModel reservationRequestModel) {
+    public ReservationResponseModel createReservation(ReservationRequestModel reservationRequestModel, String memberId) {
 
         //check if the date is in the future using the invalid date exception
         if (reservationRequestModel.getReservationDate().isBefore(LocalDate.now())){
             throw new InvalidDateException("This date is in the past: " + reservationRequestModel.getReservationDate());
         }
 
-//        Book book = bookRepository.findByBookIdentifier_BookId(reservationRequestModel.getBookId());
-//        if (book == null) {
-//            throw new NotFoundException("Unknown bookId: " + reservationRequestModel.getBookId());
-//        }
-//        // Update the book available copies
-//        book.setAvailableCopies(book.getAvailableCopies() - 1);
-//
-//        if (book.getAvailableCopies() <= 0) {
-//            throw new NotEnoughCopiesException("No available copies for bookId: " + reservationRequestModel.getBookId());
-//        }
-//
-//        Member member = memberRepository.findByMemberIdentifier_MemberId(memberId);
-//        if (member == null) {
-//            throw new NotFoundException("Unknown memberId: " + memberId);
-//        }
+        BookModel book = bookServiceClient.getBookByBookId(reservationRequestModel.getBookId());
+        if (book == null) {
+            throw new NotFoundException("Unknown bookId: " + reservationRequestModel.getBookId());
+        }
 
+        MemberModel member = memberServiceClient.getMemberByMemberId(memberId);
+        if (member == null) {
+            throw new NotFoundException("Unknown memberId: " + memberId);
+        }
+
+        if (book.getAvailableCopies() <= 0) {
+            throw new NotEnoughCopiesException("No available copies for bookId: " + reservationRequestModel.getBookId());
+        }
+
+        // Update the book available copies
+//        bookServiceClient.reduceBookAvailability(reservationRequestModel.getBookId());
+
+        //Create a new reservation
         Reservation reservation = reservationRequestMapper.requestModelToEntity(reservationRequestModel, new ReservationIdentifier());
 
+        //patch the reservation id to the member
+        memberServiceClient.patchMemberWithReservationId(memberId, reservation.getReservationIdentifier().getReservationId());
 
+        //save the reservation
         return reservationResponseMapper.entityToResponseModel(reservationRepository.save(reservation));
     }
 
     @Override
-    public ReservationResponseModel updateReservation(ReservationRequestModel reservationRequestModel, String reservationId) {
-        Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationId(reservationId);
+    public ReservationResponseModel updateReservation(ReservationRequestModel reservationRequestModel, String reservationId, String memberId) {
+        //find the reservation
+        Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationIdAndMemberId(reservationId, memberId);
         if (reservation == null) {
             throw new NotFoundException("Unknown reservationId: " + reservationId);
         }
@@ -145,18 +113,19 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // Update the book available copies
-//        Book previousBook = bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId());
-//
-//        Book newBook = bookRepository.findByBookIdentifier_BookId(reservationRequestModel.getBookId());
+//        BookModel newBook = bookServiceClient.getBookByBookId(reservationRequestModel.getBookId());
 //        if (newBook == null) {
 //            throw new NotFoundException("Unknown bookId: " + reservationRequestModel.getBookId());
 //        }
-//        if(!Objects.equals(reservation.getBookIdentifier().getBookId(), reservationRequestModel.getBookId())) {
-//            newBook.setAvailableCopies(newBook.getAvailableCopies() - 1);
-//            previousBook.setAvailableCopies(previousBook.getAvailableCopies() + 1);
-//        }
+//        if(!Objects.equals(reservation.getBookId(), reservationRequestModel.getBookId())) {
+//            //Check if the new book has available copies
+//            if (newBook.getAvailableCopies() <= 0) {
+//                throw new NotEnoughCopiesException("No available copies for bookId: " + reservationRequestModel.getBookId());
+//            }
 //
-//        Member member = memberRepository.findByMemberIdentifier_MemberId(memberId);
+//            bookServiceClient.increaseBookAvailability(reservation.getBookId());
+//            bookServiceClient.reduceBookAvailability(reservationRequestModel.getBookId());
+//        }
 
         Reservation updatedReservation = reservationRequestMapper.requestModelToEntity(reservationRequestModel, new ReservationIdentifier());
         updatedReservation.setId(reservation.getId());
@@ -165,15 +134,14 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void deleteReservation(String reservationId) {
+    public void deleteReservation(String reservationId, String memberId) {
 
-        Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationId(reservationId);
+        Reservation reservation = reservationRepository.findByReservationIdentifier_ReservationIdAndMemberId(reservationId, memberId);
         if (reservation == null) {
             throw new NotFoundException("Unknown reservationId: " + reservationId);
         }
         // Update the book available copies
-//        Book book = bookRepository.findByBookIdentifier_BookId(reservation.getBookIdentifier().getBookId());
-//        book.setAvailableCopies(book.getAvailableCopies() + 1);
+//        bookServiceClient.increaseBookAvailability(reservation.getBookId());
         reservationRepository.delete(reservation);
 
     }

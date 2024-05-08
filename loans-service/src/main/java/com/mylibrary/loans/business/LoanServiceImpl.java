@@ -14,8 +14,11 @@ import com.mylibrary.loans.mapper.LoanRequestMapper;
 import com.mylibrary.loans.mapper.LoanResponseMapper;
 import com.mylibrary.loans.presentation.LoanRequestModel;
 import com.mylibrary.loans.presentation.LoanResponseModel;
-import com.mylibrary.reservations.utils.exceptions.NotFoundException;
+
+import com.mylibrary.loans.utils.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -95,7 +98,7 @@ public class LoanServiceImpl implements LoanService{
         }
 
         //find the reservation using the reservation id and check if the reservation exists
-        ReservationModel reservation = reservationServiceClient.getReservationByReservationId(member.getReservationId());
+        ReservationModel reservation = reservationServiceClient.getReservationByReservationId(member.getReservationId(), member.getMemberId());
         if ( reservation == null) {
             throw new NotFoundException("The member needs to have a reservation before asking for a loan");
         }
@@ -105,6 +108,7 @@ public class LoanServiceImpl implements LoanService{
         if ( !reservation.getBookId().equals(loanRequestModel.getBookId())) {
             throw new NotFoundException("The bookId in the reservation does not match the bookId in the loan request");
         }
+
 
         //create the loan and return the loan response model
         Loan loan = loanRequestMapper.requestModelToEntity(loanRequestModel, new LoanIdentifier(), member,
@@ -134,7 +138,7 @@ public class LoanServiceImpl implements LoanService{
         }
 
         //find the reservation using the reservation id and check if the reservation exists
-        ReservationModel reservation = reservationServiceClient.getReservationByReservationId(loan.getReservationModel().getReservationId());
+        ReservationModel reservation = reservationServiceClient.getReservationByReservationId(loan.getReservationModel().getReservationId(), member.getMemberId());
 
         //create the updated loan, set the id, and return the loan response model
         Loan updatedLoan = loanRequestMapper.requestModelToEntity(loanRequestModel, loan.getLoanIdentifier(), member, book,
@@ -150,19 +154,28 @@ public class LoanServiceImpl implements LoanService{
         Loan loan = loanRepository.findLoanByLoanIdentifier_LoanIdAndMemberModel_MemberId(loanId, memberId);
 
         //find the member using the member id and check if the member exists
-        ReservationModel reservation = reservationServiceClient.getReservationByReservationId(loan.getReservationModel().getReservationId());
+        ReservationModel reservation = reservationServiceClient.getReservationByReservationId(loan.getReservationModel().getReservationId(), memberId);
         if ( reservation == null) {
             throw new NotFoundException("Unknown loanId: " + loanId);
         }
 
         //check if the loan and the member exist
         MemberModel member = memberServiceClient.getMemberByMemberId(memberId);
-        if ( member != null) {
+        if ( member == null) {
             throw new NotFoundException("Unknown memberId: " + memberId);
         }
 
         //delete the reservation and the loan
-        reservationServiceClient.deleteReservation(reservation.getReservationId());
+        reservationServiceClient.deleteReservation(reservation.getReservationId(), memberId);
         loanRepository.delete(loan);
+    }
+
+    //delete loan by member id
+    @Override
+    public void deleteLoans(String memberId) {
+        List<Loan> loans = loanRepository.findAllByMemberModel_MemberId(memberId);
+        for (Loan loan : loans) {
+            loanRepository.delete(loan);
+        }
     }
 }

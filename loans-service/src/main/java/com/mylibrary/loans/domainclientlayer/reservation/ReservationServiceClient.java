@@ -1,10 +1,10 @@
 package com.mylibrary.loans.domainclientlayer.reservation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mylibrary.reservations.utils.exceptions.NotFoundException;
-import com.mylibrary.loans.domainclientlayer.reservation.ReservationModel;
+
 import com.mylibrary.loans.utils.exceptions.HttpErrorInfo;
 import com.mylibrary.loans.utils.exceptions.InvalidInputException;
+import com.mylibrary.loans.utils.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,6 +12,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -24,32 +25,62 @@ public class ReservationServiceClient {
 
     private final ObjectMapper mapper;
 
-    private final String CUSTOMER_SERVICE_BASE_URL;
+    private final String RESERVATION_SERVICE_BASE_URL;
 
     private ReservationServiceClient(RestTemplate restTemplate, ObjectMapper mapper,
-                              @Value("${app.reservations-service.host}") String reservationServiceHost,
-                              @Value("${app.reservations-service.port}") String reservationServicePort) {
+                                     @Value("${app.reservations-service.host}") String reservationServiceHost,
+                                     @Value("${app.reservations-service.port}") String reservationServicePort) {
         this.restTemplate = restTemplate;
         this.mapper = mapper;
 
-        CUSTOMER_SERVICE_BASE_URL = "http://" + reservationServiceHost + ":" + reservationServicePort + "/api/v1/reservations";
+        RESERVATION_SERVICE_BASE_URL = "http://" + reservationServiceHost + ":" + reservationServicePort + "/api/v1/members/";
     }
 
-    public ReservationModel getReservationByReservationId(String reservationId) {
+    public ReservationModel getReservationByReservationId(String reservationId, String memberId) {
         try{
-            String url = CUSTOMER_SERVICE_BASE_URL + "/" + reservationId;
+            String url = RESERVATION_SERVICE_BASE_URL + memberId + "/reservations/" + reservationId;
 
-            ReservationModel reservationModel = restTemplate.getForObject(url, ReservationModel.class);
-
-            return reservationModel;
+            return restTemplate.getForObject(url, ReservationModel.class);
         } catch (HttpClientErrorException ex) {
             throw  handleHttpClientException(ex);
         }
     }
 
-    public void deleteReservation(String reservationId) {
+    public List<ReservationModel> getAllReservations(String memberId) {
         try {
-            String url = CUSTOMER_SERVICE_BASE_URL + "/" + reservationId;
+            String url = RESERVATION_SERVICE_BASE_URL + memberId + "/reservations";
+
+            ReservationModel[] reservationModels = restTemplate.getForObject(url, ReservationModel[].class);
+            assert reservationModels != null;
+            return List.of(reservationModels);
+        } catch (HttpClientErrorException ex) {
+            throw handleHttpClientException(ex);
+        }
+    }
+
+    public ReservationModel createReservation(ReservationModel reservation, String memberId) {
+        try {
+            String url = RESERVATION_SERVICE_BASE_URL + memberId + "/reservations";
+
+            return restTemplate.postForObject(url, reservation, ReservationModel.class);
+        } catch (HttpClientErrorException ex) {
+            throw handleHttpClientException(ex);
+        }
+    }
+
+    public void updateReservation(ReservationModel reservation, String memberId) {
+        try {
+            String url = RESERVATION_SERVICE_BASE_URL + memberId + "/reservations/" + reservation.getReservationId();
+
+            restTemplate.put(url, reservation);
+        } catch (HttpClientErrorException ex) {
+            throw handleHttpClientException(ex);
+        }
+    }
+
+    public void deleteReservation(String reservationId, String memberId) {
+        try {
+            String url = RESERVATION_SERVICE_BASE_URL + memberId + "/reservations/" +  reservationId;
 
             restTemplate.delete(url);
         } catch (HttpClientErrorException ex) {

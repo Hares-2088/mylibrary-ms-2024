@@ -47,7 +47,13 @@ spring:
       platform: h2
       mode: always
 
-
+app:
+  loans-service:
+    host: loans-service
+    port: 7001
+  reservations-service:
+    host: reservations-service
+    port: 7003
 
 ---
 
@@ -75,3 +81,11 @@ spring:
 server.port: 8080
 
 spring.datasource.hikari.initializationFailTimeout: 60000
+
+app:
+  loans-service:
+    host: loans-service
+    port: 8080
+  reservations-service:
+    host: reservations-service
+    port: 8080

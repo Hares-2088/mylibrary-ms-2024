@@ -38,6 +38,11 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(memberService.updateMember(memberRequestModel, memberId));
     }
 
+    @PatchMapping(value = "/{memberId}/addReservation/{reservationId}", produces = "application/json")
+    public ResponseEntity<MemberResponseModel> patchMemberWithReservationId(@PathVariable String memberId, @PathVariable String reservationId) {
+        return ResponseEntity.status(HttpStatus.OK).body(memberService.patchMemberWithReservationId(memberId, reservationId));
+    }
+
     @DeleteMapping(value = "/{memberId}")
     public ResponseEntity<Void> deleteMember(@PathVariable String memberId) {
         memberService.deleteMember(memberId);

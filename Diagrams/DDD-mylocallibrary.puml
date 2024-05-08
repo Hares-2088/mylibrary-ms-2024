@@ -19,36 +19,11 @@ package "Library Management System" as LibrarySystem {
             availableCopies: Integer
         }
 
-        ENTITY(Author) #lightblue {
-            authorId: Long
-            firstName: String
-            lastName: String
-            biography: String
-        }
-
-        VALUE_OBJECT(Nationality) #Bisque{
-            city: String
-            province: String
-            country: String
-        }
-
-
         VALUE_OBJECT(BookIdentifier) #Bisque {
             isbn: String
         }
 
-        VALUE_OBJECT(AuthorIdentifier) #Bisque {
-            authorId: UUID
-        }
-
-
-
-
-        Book "1"--> "1" AuthorIdentifier
-        Author o-"1" Nationality
         Book --> BookIdentifier
-        Author --> AuthorIdentifier
-        Author "1"--- "0..*" BookIdentifier
     }
 
     package "Membership Sub-Domain" <<Rectangle>> #FFCDD2 {
@@ -75,6 +50,10 @@ package "Library Management System" as LibrarySystem {
                 country: String
         }
 
+        note right of Member #lightblue
+            Constraint: Delete all loans and reservations when member is deleted
+        end note
+
         Member --> MemberIdentifier
         Member o-- "1..*" Address
         Member o-- "1" MembershipType
@@ -96,13 +75,15 @@ package "Library Management System" as LibrarySystem {
         }
 
         note right of Loan #lightblue
-            Constraint: The member has to have a reservation for the book
+            Constraint: The reservation has to be deleted when the loan is deleted
         end note
 
         Loan "1" o-- "1" LoanPeriod
         Loan --> LoanIdentifier
-'        Loan --> BookIdentifier
-'        Loan --> MemberIdentifier
+        Loan --> BookIdentifier
+        Loan --> MemberIdentifier
+
+
     }
     package "Late Fees Sub-Domain" <<Rectangle>> #Yellow{
 
@@ -123,7 +104,8 @@ package "Library Management System" as LibrarySystem {
 
     package "Reservation Sub-Domain" <<Rectangle>> #FFA07A{
         AGGREGATE_ROOT_ENTITY(Reservation) #lightblue {
-            reservationId: Long
+            reservationId: String
+            memberId: String
             reservationDate: Date
             fulfilled: Boolean
         }
@@ -137,13 +119,14 @@ package "Library Management System" as LibrarySystem {
         end note
 
         Reservation --> ReservationIdentifier
-'        Reservation --> MemberIdentifier
+        Reservation --> MemberIdentifier
     }
 
-'    Member "1" --> "0..*" ReservationIdentifier
-'    Loan --> LateFeeIdentifier
-'    Member "1" --> "0..*" BookIdentifier
-'    Reservation --> BookIdentifier
+    Member "1" --> "0..*" ReservationIdentifier
+    Loan --> LateFeeIdentifier
+    Member "1" --> "0..*" BookIdentifier
+    Reservation --> BookIdentifier
+    Loan --> ReservationIdentifier
 
 }
 

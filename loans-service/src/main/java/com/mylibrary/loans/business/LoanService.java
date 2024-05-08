@@ -13,5 +13,6 @@ public interface LoanService {
     LoanResponseModel createLoan(LoanRequestModel loanRequestModel, String memberId);
     LoanResponseModel updateLoan(LoanRequestModel loanRequestModel, String loanId, String memberId);
     void deleteLoan(String loanId, String memberId);
+    void deleteLoans(String memberId);
 
 }

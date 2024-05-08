@@ -1,19 +1,5 @@
--- Authors
-INSERT INTO authors (author_id, first_name, last_name, biography, city, province, country)
-VALUES
-    ('a1', 'Adem', 'Doe', 'Biography of John Doe', 'New York', 'New York', 'USA'),
-    ('a2', 'Jane', 'Smith', 'Biography of Jane Smith', 'London', 'Greater London', 'UK'),
-    ('a3', 'Michael', 'Johnson', 'Biography of Michael Johnson', 'Los Angeles', 'California', 'USA'),
-    ('a4', 'Emily', 'Brown', 'Biography of Emily Brown', 'Sydney', 'New South Wales', 'Australia'),
-    ('a5', 'David', 'Wilson', 'Biography of David Wilson', 'Toronto', 'Ontario', 'Canada'),
-    ('a6', 'Emma', 'Jones', 'Biography of Emma Jones', 'Paris', 'Île-de-France', 'France'),
-    ('a7', 'William', 'Taylor', 'Biography of William Taylor', 'Berlin', 'Berlin', 'Germany'),
-    ('a8', 'Olivia', 'Martinez', 'Biography of Olivia Martinez', 'Madrid', 'Community of Madrid', 'Spain'),
-    ('a9', 'Noah', 'Garcia', 'Biography of Noah Garcia', 'Rome', 'Lazio', 'Italy'),
-    ('a10', 'Sophia', 'Lee', 'Biography of Sophia Lee', 'Beijing', 'Beijing', 'China');
-
 -- Books
-INSERT INTO books (book_id, author_id, title, publication_year, genre, description, available_copies)
+INSERT INTO books (book_id, author_name, title, publication_year, genre, description, available_copies)
 VALUES
     ('b1', 'a1', 'Sample Book 1', '2023-01-01', 'Fiction', 'This is a sample description for Sample Book 1.', '5'),
     ('b2', 'a2', 'Sample Book 2', '2020-05-15', 'Non-Fiction', 'This is a sample description for Sample Book 2.', '10'),

@@ -1,6 +1,7 @@
 CREATE TABLE MEMBERS (
      id SERIAL,
      member_id VARCHAR(36),
+     reservation_id VARCHAR(36),
      first_name VARCHAR(50),
      last_name VARCHAR(50),
      email VARCHAR(100),

@@ -27,7 +27,7 @@ public class LoanResponseModel{
 
     private String bookTitle;
 
-    private String availableCopies;
+    private Integer availableCopies;
 
     private String reservationId;
 

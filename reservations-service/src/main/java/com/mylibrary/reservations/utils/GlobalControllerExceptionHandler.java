@@ -1,14 +1,12 @@
 package com.mylibrary.reservations.utils;
 
-import com.mylibrary.reservations.utils.exceptions.HttpErrorInfo;
-import com.mylibrary.reservations.utils.exceptions.InvalidDateException;
+import com.mylibrary.reservations.utils.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
-import com.mylibrary.reservations.utils.exceptions.NotFoundException;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -30,8 +28,20 @@ public class GlobalControllerExceptionHandler {
     }
 
     @ResponseStatus(UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(NotEnoughCopiesException.class)
+    public HttpErrorInfo NotEnoughCopiesException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
+    }
+
+    @ResponseStatus(UNPROCESSABLE_ENTITY)
     @ExceptionHandler(InvalidDateException.class)
     public HttpErrorInfo handleInvalidDateException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
+    }
+
+    @ResponseStatus(UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(InvalidInputException.class)
+    public HttpErrorInfo InvalidInputException(WebRequest request, Exception ex) {
         return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
     }
 

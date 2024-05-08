@@ -10,10 +10,8 @@ import java.util.List;
 public interface ReservationService {
 
     List<ReservationResponseModel> getAllReservations();
-    ReservationResponseModel getReservationByReservationId(String reservationId);
-//    List<ReservationResponseModel> getReservations(String memberId);
-//    ReservationResponseModel getReservation(String reservationId, String memberId);
-    ReservationResponseModel createReservation(ReservationRequestModel reservationRequestModel);
-    ReservationResponseModel updateReservation(ReservationRequestModel reservationRequestModel, String reservationId);
-    void deleteReservation(String reservationId);
+    ReservationResponseModel getReservationByReservationId(String reservationId, String memberId);
+    ReservationResponseModel createReservation(ReservationRequestModel reservationRequestModel, String memberId);
+    ReservationResponseModel updateReservation(ReservationRequestModel reservationRequestModel, String reservationId, String memberId);
+    void deleteReservation(String reservationId, String memberId);
 }

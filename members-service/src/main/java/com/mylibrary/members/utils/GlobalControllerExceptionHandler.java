@@ -1,6 +1,7 @@
 package com.mylibrary.members.utils;
 
 import com.mylibrary.members.utils.exceptions.HttpErrorInfo;
+import com.mylibrary.members.utils.exceptions.InvalidInputException;
 import com.mylibrary.members.utils.exceptions.NotFoundException;
 import com.mylibrary.members.utils.exceptions.NotInRegionException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +28,19 @@ public class GlobalControllerExceptionHandler {
 
     @ResponseStatus(NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
-    public HttpErrorInfo handleNotFoundException(WebRequest request, Exception ex) {
+    public HttpErrorInfo notFoundException(WebRequest request, Exception ex) {
         return createHttpErrorInfo(NOT_FOUND, request, ex);
     }
 
     @ResponseStatus(UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotInRegionException.class)
     public HttpErrorInfo handleNotInRegionException(WebRequest request, Exception ex) {
+        return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
+    }
+
+    @ResponseStatus(UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(InvalidInputException.class)
+    public HttpErrorInfo handleInvalidInputException(WebRequest request, Exception ex) {
         return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
     }
 

@@ -2,7 +2,7 @@ package com.mylibrary.reservations.dataacess;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.AfterMapping;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -26,10 +26,11 @@ class ReservationRepositoryIntegrationTest {
 
         //arrange
         Reservation reservation = new Reservation(LocalDate.now());
+        reservation.setMemberId("m1");
         reservationRepository.save(reservation);
 
         //act
-        Reservation savedReservation = reservationRepository.findByReservationIdentifier_ReservationId(reservation.getReservationIdentifier().getReservationId());
+        Reservation savedReservation = reservationRepository.findByReservationIdentifier_ReservationIdAndMemberId(reservation.getReservationIdentifier().getReservationId(), reservation.getMemberId());
 
         //assert
         assertNotNull(savedReservation);
@@ -39,7 +40,7 @@ class ReservationRepositoryIntegrationTest {
     @Test
     public void whenReservationDoesNotExist_ReturnNull() {
         //act
-        Reservation savedReservation = reservationRepository.findByReservationIdentifier_ReservationId("1234");
+        Reservation savedReservation = reservationRepository.findByReservationIdentifier_ReservationIdAndMemberId("1234", "1234");
 
         //assert
         assertNull(savedReservation);

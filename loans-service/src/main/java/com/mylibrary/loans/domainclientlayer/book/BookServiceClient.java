@@ -1,9 +1,9 @@
 package com.mylibrary.loans.domainclientlayer.book;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mylibrary.books.utils.exceptions.NotFoundException;
 import com.mylibrary.loans.utils.exceptions.HttpErrorInfo;
 import com.mylibrary.loans.utils.exceptions.InvalidInputException;
+import com.mylibrary.loans.utils.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

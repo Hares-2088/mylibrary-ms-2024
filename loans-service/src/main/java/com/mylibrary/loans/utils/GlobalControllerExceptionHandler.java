@@ -1,10 +1,10 @@
 package com.mylibrary.loans.utils;
 
-import com.mylibrary.books.utils.exceptions.HttpErrorInfo;
-import com.mylibrary.books.utils.exceptions.InvalidPublicationYear;
-import com.mylibrary.books.utils.exceptions.NotEnoughCopiesException;
-import com.mylibrary.books.utils.exceptions.NotFoundException;
+
+import com.mylibrary.loans.utils.exceptions.HttpErrorInfo;
 import com.mylibrary.loans.utils.exceptions.InvalidInputException;
+import com.mylibrary.loans.utils.exceptions.InvalidPublicationYear;
+import com.mylibrary.loans.utils.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

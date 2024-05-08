@@ -1,11 +1,9 @@
 package com.mylibrary.loans.dataacess;
 
-import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
-@Embeddable
 @Getter
 public class LoanPeriod {
     private LocalDate loanDate;

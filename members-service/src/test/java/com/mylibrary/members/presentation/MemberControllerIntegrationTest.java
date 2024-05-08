@@ -1,16 +1,29 @@
 package com.mylibrary.members.presentation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mylibrary.members.dataacess.MemberRepository;
 import com.mylibrary.members.dataacess.MemberType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("h2")
@@ -18,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberControllerIntegrationTest {
 
     private final String BASE_URI_MEMBERS = "api/v1/members";
-    private final String FOUND_MEMBER_ID = "testid1";
+    private final String FOUND_MEMBER_ID = "m1";
     private final String NOT_FOUND_MEMBER_ID = "m0";
 
     @Autowired
@@ -26,6 +39,17 @@ class MemberControllerIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    private MockRestServiceServer mockRestServiceServer;
+    private ObjectMapper mapper = new ObjectMapper();
+
+    @BeforeEach
+    void init() {
+        mockRestServiceServer = MockRestServiceServer.createServer(restTemplate);
+    }
 
 
     @Test
@@ -213,6 +237,18 @@ class MemberControllerIntegrationTest {
 
     @Test
     public void whenMemberExist_thenDeleteMember() {
+
+        // Mock the response of reservationServiceClient
+        mockRestServiceServer.expect(ExpectedCount.once(),
+                        requestTo("http://reservations-service:7003/api/v1/members/" + FOUND_MEMBER_ID + "/reservations/" + "r1"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
+                .andRespond(withStatus(HttpStatus.OK));
+
+        // Mock the response of loanServiceClient
+        mockRestServiceServer.expect(ExpectedCount.once(),
+                        requestTo("http://loans-service:7001/api/v1/members/" + FOUND_MEMBER_ID + "/loans"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
+                .andRespond(withStatus(HttpStatus.OK));
 
         // Act: Delete the member
         webTestClient.delete()

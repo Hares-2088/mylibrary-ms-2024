@@ -11,10 +11,11 @@ import org.mapstruct.Mapping;
 public interface LoanResponseMapper {
 
     @Mapping(expression = "java(loan.getLoanIdentifier().getLoanId())", target = "loanId")
-    @Mapping(expression = "java(loan.getMemberModel.getMemberId())", target = "memberId")
-    @Mapping(expression = "java(loan.getMemberModel.getMemberReservationId())", target = "reservationId")
-    @Mapping(expression = "java(loan.getMemberModel.getMemberFirstName())", target = "memberFirstName")
-    @Mapping(expression = "java(loan.getMemberModel.getMemberLastName())", target = "memberLastName")
+    @Mapping(expression = "java(loan.getMemberModel().getMemberId())", target = "memberId")
+    @Mapping(expression = "java(loan.getMemberModel().getReservationId())", target = "reservationId")
+    @Mapping(expression = "java(loan.getMemberModel().getMemberFirstName())", target = "memberFirstName")
+    @Mapping(expression = "java(loan.getMemberModel().getMemberLastName())", target = "memberLastName")
+    @Mapping(expression = "java(loan.getReservationModel().getReservationDate().toString())", target = "reservationDate")
     @Mapping(expression = "java(loan.getLoanPeriod().getLoanDate())", target = "loanDate")
     @Mapping(expression = "java(loan.getLoanPeriod().getDueDate())", target = "dueDate")
     @Mapping(expression = "java(loan.getBookModel().getBookId())", target = "bookId")

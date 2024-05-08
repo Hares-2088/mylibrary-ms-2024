@@ -47,7 +47,13 @@ spring:
       platform: h2
       mode: always
 
-
+app:
+  books-service:
+    host: books-service
+    port: 7001
+  members-service:
+    host: members-service
+    port: 7002
 
 ---
 
@@ -72,6 +78,16 @@ spring:
       platform: mysql
       mode: always
 
+
 server.port: 8080
 
+
 spring.datasource.hikari.initializationFailTimeout: 60000
+
+app:
+  books-service:
+    host: books-service
+    port: 8080
+  members-service:
+    host: members-service
+    port: 8080

@@ -17,5 +17,7 @@ public class ReservationResponseModel{
 
     private String bookId;
 
+    private String memberId;
+
     private LocalDate reservationDate;
 }

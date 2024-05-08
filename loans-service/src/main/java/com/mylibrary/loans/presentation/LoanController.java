@@ -44,4 +44,10 @@ public class LoanController {
         loanService.deleteLoan(loanId, memberId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteLoans(@PathVariable String memberId) {
+        loanService.deleteLoans(memberId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
